@@ -1,67 +1,11 @@
 (ns spellcast.core
-  (:use clojure.tools.logging)
-  (:require [clojure.core.async :as async :refer :all]))
-
-(def universe
-  "The central data for all worlds."
-  (atom {}))
-
-(defn init!
-  "We start with an empty universe, use this in repl to restart."
-  []
-  (info "Reset universe to initial state")
-  (reset! universe {}))
-
-(defn create-world!
-  "Add a new world to the universe."
-  [name]
-  (info (str "world " name " created"))
-  (swap! universe
-         (fn create-world [worlds]
-           (assoc worlds
-             name {:players {},
-                   :started false,
-                   :chan (chan)}))))
-
-(defn remove-world!
-  "removes the given world from the univers"
-  [world-name]
-  (info (str "world " world-name " removed."))
-  (swap! universe
-         (fn remove-world [worlds]
-           (dissoc worlds world-name))))
-
-(defn world
-  "Get a specific world from the universe."
-  [name]
-  (get @universe name))
-
-(defn update-world!
-  [world-name world-updater]
-  (swap! universe
-         (fn update-world [worlds]
-           (let [world (get worlds world-name)]
-             (assoc worlds
-               world-name (world-updater world)))))
-  (go
-   (>! (:chan (world world-name))
-       :update))) 
-
-(defn add-player
-  [world name]
-  (info (str "player " name " world added"))
-  (assoc world :players
-         (assoc (:players world)
-           name {:ready false,
-                 :active true}))) 
-
-(defn get-players
-  "Return the list of player with name included."
-  [world]
-  (for [[name player]
-        (:players (world))]
-    (assoc player :name name)))
-
+  (:require
+   [clojure.core :as core]
+   [clojure.core.async :as async :refer [chan <!! >!! go <! >!]])
+    (:use
+     clojure.tools.logging
+     spellcast.control.universe
+     spellcast.control.player))
 
 (defn evaluate-spells ;; FIXME: put some logic here
   [world]
@@ -79,7 +23,7 @@
           (<!! (:chan (world world-name)))
           (not (:started (world world-name))))))
 
-(defn all-players-ready!!
+(defn all-players-ready!!  ;; here is a bug! use structure from above
   "Read from the world channels until all players are ready."
   [world]
   (let [players (get-players world),
@@ -99,7 +43,7 @@
   [world]
   true)
 
-(defn game-loop!!
+(defn game-loop!! ;; FIXME correct loop
   "Main game loop runs until the game is over."
   [world-name]
   (game-started!! world-name)

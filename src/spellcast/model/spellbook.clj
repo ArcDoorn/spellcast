@@ -1,4 +1,4 @@
-(ns spellcast.spellbook)
+(ns spellcast.model.spellbook)
 
 (def book {[:C :D :P :W]             :dispel-magic,
            [:C :S :W :W :S]          :summon-elemental,

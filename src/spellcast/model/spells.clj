@@ -1,4 +1,4 @@
-(ns spellcast.spells)
+(ns spellcast.model.spells)
 
 (defmacro defspell
   "Defines a spell.

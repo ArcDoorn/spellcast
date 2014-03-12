@@ -1,4 +1,4 @@
-(ns spellcast.gestures)
+(ns spellcast.model.gestures)
 ; :F :P :S :W :D :df :dp :ds :dw :dd :C :stab nil
 
 

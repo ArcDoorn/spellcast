@@ -1,0 +1,5 @@
+* TODO Reorder files and functions
+* TODO Correct (first order) game logic
+* TODO Get (test) player communictation working
+* TODO Configure logging
+* TODO Websockets for reporting
