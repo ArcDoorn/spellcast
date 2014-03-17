@@ -1,8 +1,8 @@
 (ns spellcast.control.player
   (:use clojure.tools.logging
-        spellcast.control.universe)
+        spellcast.control.universe
+        spellcast.model.player)
   (:require
-   [clojure.core :as core]
    [clojure.core.async :as async :refer [chan <!! >!! go <! >!]]))
 
 (defn report-to-player!!
@@ -19,7 +19,7 @@
   connection."
   [world-name player-name] 
   (let [channel (chan)]
-    (update-world
+    (update-world!
      world-name
      (fn player-to-world
        [world]

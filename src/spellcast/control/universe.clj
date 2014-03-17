@@ -14,16 +14,22 @@
   (info "Reset universe to initial state")
   (reset! universe {}))
 
+(defn new-world
+  "generates a fresh, new, empty world."
+  []
+  {:players {}
+   :started false
+   :chan (chan)})
+
 (defn create-world!
-  "Add a new world to the universe."
+  "Add a new world to the universe, if not already exists"
   [name]
   (info (str "world " name " created"))
   (swap! universe
          (fn create-world [worlds]
-           (assoc worlds
-             name {:players {},
-                   :started false,
-                   :chan (chan)}))))
+           (when (not (get worlds name))
+             (assoc worlds
+               name (new-world))))))
 
 (defn remove-world!
   "removes the given world from the univers"
@@ -51,3 +57,9 @@
    (>! (:chan (world world-name))
        :update))) 
 
+(defn start-game!
+  "Start the game for the given world."
+  [world-name]
+  (update-world! world-name
+                 (fn set-start [world]
+                   (assoc world :started true))))
