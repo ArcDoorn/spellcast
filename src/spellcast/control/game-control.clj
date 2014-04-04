@@ -14,19 +14,12 @@
   [world]
   (println world)) ; FIXME
 
-(defn wait-until
-  "returns a response channel, that waits until the test is
-  fullfilled after reading a message from the input channel."
-  [channel test?]
-  (go (while (and (<! channel)
-                  (test?)))))
-
-(defn game-started!!
-  "waits until the game started."
-  [world-name]
-  (while (and
-          (<!! (:chan (world world-name)))
-          (not (:started (world world-name))))))
+(defmacro wait-until!  
+  "Waits until the test is fullfilled after reading a message from the
+  input channel. Must be used in a go block."
+  [channel & test?]
+  `(while (and (<! ~channel)
+               (not ~@test?))))
 
 (defn all-players-ready!!  ;; here is a bug! use structure from above
   "Read from the world channels until all players are ready."
@@ -39,20 +32,30 @@
 (defn play-round!!
   "When all players are ready evaluate the spells."
   [world-name]
-  (all-players-ready!! (world world-name))
-  (update-world! world-name evaluate-spells)
-  (publish-result (world world-name)))
+  (go ; should be replayed by a wait until 
+      (all-players-ready!! (world world-name))
+      ; evaluate guestures
+      ; tell possible spells to player
+      ; wait for spell selection and target
+      (update-world! world-name evaluate-spells)
+      ; --> this should be done step by step
+      ; --> each step should be directly published
+      ))
 
-(defn game-loop!! ;; FIXME correct loop
+(defn game-loop!! 
   "Main game loop runs until the game is over."
   [world-name]
-  (game-started!! world-name)
-  (while (not (game-over? (world world-name)))
-    (play-round!! world-name))
-  (remove-world! world-name))
+  (let [ch (:chan (world world-name))]
+    (go
+     (wait-until! ch (:started (world world-name)))
+     (while (not (game-over? (world world-name)))
+       (<! (play-round!! world-name)))
+     (remove-world! world-name))))
 
 (defn new-game!
   "Start the game in a new world"
   [world-name]
   (create-world! world-name)
-  (future (game-loop!! world-name)))
+  (go (<! (game-loop!! world-name))))
+
+

@@ -10,7 +10,7 @@
   [world]
   (info (str "game over?!"))
   (<= (count
-       (filter (fn [player]
+       (filter (fn [[name player]]
                  (info (str player
                              (:active player)
                              (:alive player)))
