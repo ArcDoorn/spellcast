@@ -23,7 +23,7 @@
      world-name
      (fn player-to-world
        [world]
-       (add-player world name channel))) 
+       (add-player world player-name channel))) 
     (report-to-player!! player-name channel)))
 
   

@@ -1,3 +1,12 @@
+* Testgame, that can be oserved
+** world with two players
+** actions are written somewhere
+** actions are hard coded
+** game is started
+** basic logic allows A to do destructive spells 
+** B does nothing and is killed
+** game over is reported
+
 * TODO Reorder files and functions
 * TODO Correct (first order) game logic
 * TODO Get (test) player communictation working
